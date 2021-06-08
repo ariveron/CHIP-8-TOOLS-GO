@@ -1,0 +1,44 @@
+;******************************************
+;* CHIP-8 program that counts from 0 to F,
+;* incrementing every second and 
+;* overflowing back to 0 after reaching F.
+;* The sprite can also be moved with the
+;* WASD keys.
+;******************************************
+
+  LD V0, 0        ; char to display
+  LD V1, 32       ; x coordinate
+  LD V2, 16       ; y coordinate
+  LD V3, 60       ; 1 second
+  LD V4, 60       ; timer variable
+  LD V5, 5        ; up key
+  LD V6, 8        ; down key
+  LD V7, 7        ; left key
+  LD V8, 9        ; right key
+  LD V9, 1        ; used for inc and dec movement
+  LD DT, V4       ; reset timer to 0
+get-time:
+  LD V4, DT       ; get remaining time
+  SE V4, 0        ; only update and draw when timer is 0
+    JMP $loop
+  LD DT, V3       ; reset timer to 60 (1 second)
+  ADD V0, 1       ; set to next char
+  SNE V0, 16      ; reset char to 0 if over 15
+    LD V0, 0
+loop:
+  LD F, V0        ; load the char to display in I
+  CLS             ; clear the screen 
+  DRAW V1, V2, 5  ; draw the V0 char
+  CALL $move      ; move sprite based on key presses
+  JMP $get-time   ; repeat the loop
+move:
+  SKNP V5         ; move sprite up if up key
+    SUB V2, V9
+  SKNP V6         ; move sprite down if down key
+    ADD V2, V9
+  SKNP V7         ; move sprite left if left key
+    SUB V1, V9
+  SKNP V8         ; move sprite right if right key
+    ADD V1, V9
+skip-move:
+  RET
